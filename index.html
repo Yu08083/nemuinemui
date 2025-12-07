@@ -2,209 +2,423 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>アイテム検索ツール</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Denpa Item Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h2 {
-      text-align: center;
-    }
-    .search-bar {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
-    input {
-      font-size: 16px;
-      padding: 8px;
-      width: 300px;
-      max-width: 90%;
-    }
-    button {
-      font-size: 16px;
-      padding: 8px 16px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #45a049;
-    }
-    .results {
-      max-height: 500px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 10px;
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-sub: #6b7280;
+      --border-radius: 12px;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+      --shadow-md: 0 8px 30px rgba(0,0,0,0.08);
+      --accent-hex: #e0f2fe;
+      --text-hex: #0284c7;
+      --accent-int: #dcfce7;
+      --text-int: #16a34a;
     }
 
-    /* PC版: テーブル表示 */
-    .pc-view table {
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    #login-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-color);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .login-card {
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 12px;
+      margin: 20px 0;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+      transition: all 0.3s;
+    }
+    .login-input:focus {
+      border-color: #764ba2;
+      outline: none;
+    }
+
+    #app-container {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    header {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      margin-bottom: -40px;
+      padding-bottom: 60px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    h1 i { margin-right: 10px; }
+
+    .subtitle {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-top: 5px;
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+      position: relative;
+    }
+
+    .search-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: 'Roboto Mono', monospace;
+      resize: vertical;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+      background-color: #f9fafb;
+    }
+
+    textarea:focus {
+      border-color: #8b5cf6;
+      background-color: #fff;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-grow: 1;
+      justify-content: flex-end;
+    }
+
+    button {
+      border: none;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    button:active { transform: scale(0.98); }
+
+    .btn-search {
+      background: var(--primary-gradient);
+      color: white;
+      box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+    }
+    .btn-search:hover { box-shadow: 0 6px 16px rgba(118, 75, 162, 0.4); }
+
+    .btn-download {
+      background-color: #10b981;
+      color: white;
+    }
+    .btn-download:hover { background-color: #059669; }
+
+    .btn-clear {
+      background-color: #f3f4f6;
+      color: var(--text-sub);
+    }
+    .btn-clear:hover { background-color: #e5e7eb; color: var(--text-main); }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-sub);
+    }
+
+    .badge-count {
+      background: #e0e7ff;
+      color: #4338ca;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    #loading {
+      color: #764ba2;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    .results-wrapper {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      min-height: 300px;
+    }
+
+    table {
       width: 100%;
       border-collapse: collapse;
     }
-    .pc-view thead {
+
+    thead {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
       position: sticky;
       top: 0;
-      background: #f4f4f4;
-    }
-    .pc-view th, .pc-view td {
-      padding: 8px;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-      font-family: monospace;
-    }
-    .pc-view tr:hover {
-      background-color: #f9f9f9;
+      z-index: 10;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
-    /* スマホ版: 縦カード表示 */
-    .mobile-view .item-card {
-      border-bottom: 1px solid #ddd;
-      padding: 10px 0;
-      font-family: monospace;
+    th {
+      text-align: left;
+      padding: 16px 20px;
+      font-weight: 700;
+      color: var(--text-sub);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
-    .mobile-view .item-card:last-child {
-      border-bottom: none;
+
+    td {
+      padding: 14px 20px;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    
+    tr { transition: background 0.15s; }
+    tr:hover { background-color: #fafafa; }
+
+    .code-badge {
+      font-family: 'Roboto Mono', monospace;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      display: inline-block;
+    }
+
+    .bg-hex { background-color: var(--accent-hex); color: var(--text-hex); }
+    .bg-int { background-color: var(--accent-int); color: var(--text-int); }
+
+    .item-name {
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .mobile-view { display: none; padding: 20px; }
+    
+    .m-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .m-header {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .m-title {
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1.4;
+      color: var(--text-main);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .no-results {
+      padding: 50px;
       text-align: center;
-      color: #888;
-      padding: 20px;
+      color: #9ca3af;
+      font-size: 1.1rem;
+    }
+    
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      display: block;
+      color: #e5e7eb;
     }
 
-    /* スマホ切り替え */
     @media (max-width: 768px) {
       .pc-view { display: none; }
       .mobile-view { display: block; }
-    }
-    @media (min-width: 769px) {
-      .pc-view { display: block; }
-      .mobile-view { display: none; }
+      .btn-group { flex-direction: column; width: 100%; }
+      button { width: 100%; justify-content: center; }
+      .search-card { padding: 20px; }
     }
   </style>
 </head>
 <body>
-  <h2>アイテム検索ツール</h2>
-  <div class="search-bar">
-    <input id="query" type="text" placeholder="例: ジュエルのかけら">
-    <button onclick="searchItems()">検索</button>
+
+<div id="login-screen">
+  <div class="login-card">
+    <h2 style="color: #764ba2; margin-bottom: 10px;">
+      <i class="fa-solid fa-lock"></i> Restricted Access
+    </h2>
+    <p style="color: #666; font-size: 0.9rem;">Password Required</p>
+    
+    <input type="password" id="password-input" class="login-input" placeholder="Password">
+    
+    <button class="btn-search" onclick="checkPassword()" style="width: 100%; justify-content: center;">
+      Login <i class="fa-solid fa-arrow-right"></i>
+    </button>
+    <p id="login-error" style="color: #ef4444; margin-top: 15px; display: none; font-size: 0.9rem;">
+      <i class="fa-solid fa-circle-exclamation"></i> Invalid Password
+    </p>
   </div>
+</div>
 
-  <!-- PC表示 -->
-  <div class="results pc-view">
-    <table id="results-pc">
-      <thead>
-        <tr>
-          <th>HexID</th>
-          <th>ShortID</th>
-          <th>Name</th>
-          <th>SignedInt</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="4" class="no-results">🔍 検索ワードを入力してください</td></tr>
-      </tbody>
-    </table>
-  </div>
+<div id="app-container">
+  <header>
+    <h1><i class="fa-solid fa-satellite-dish"></i> Denpa Item Search</h1>
+    <div class="subtitle">Multi-Line Bulk Search Tool</div>
+  </header>
 
-  <!-- スマホ表示 -->
-  <div class="results mobile-view" id="results-mobile">
-    <div class="no-results">🔍 検索ワードを入力してください</div>
-  </div>
+  <div class="container">
+    <div class="search-card">
+      <div class="input-group">
+        <textarea id="query" placeholder="Enter keywords (Line separated for bulk search)..."></textarea>
+      </div>
+      
+      <div class="controls">
+        <div id="loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading data...</div>
+        <div class="btn-group">
+          <button class="btn-clear" onclick="clearInput()">
+            <i class="fa-solid fa-eraser"></i> Clear
+          </button>
+          <button class="btn-download" onclick="downloadCSV()">
+            <i class="fa-solid fa-file-csv"></i> Save CSV
+          </button>
+          <button class="btn-search" onclick="searchItems()">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+          </button>
+        </div>
+      </div>
+    </div>
 
-  <script>
-    let data = [];
+    <div class="status-bar">
+      <span id="result-status">Ready</span>
+      <span id="result-count" class="badge-count">0</span>
+    </div>
 
-    // GitHubからデータ取得
-    fetch("https://raw.githubusercontent.com/Yu08083/item-database-denpa/main/itemlist_with_shortid.txt")
-      .then(res => res.text())
-      .then(text => {
-        data = text.trim().split("\n").map(line => {
-          let parts = line.split("_");
-          if (parts.length === 5) {
-            return {
-              HexID: parts[1].toUpperCase(),
-              ShortID: parts[2].toLowerCase(),
-              Name: parts[3],
-              SignedInt: parseInt(parts[4])
-            };
-          }
-          return null;
-        }).filter(Boolean);
-      });
-
-    // 入力正規化（全角数字→半角、カンマ削除）
-    function normalizeQuery(q) {
-      q = q.replace(/[０-９]/g, d => String.fromCharCode(d.charCodeAt(0) - 65248));
-      q = q.replace(/,/g, "");
-      return q.trim().toLowerCase();
-    }
-
-    function searchItems() {
-      let rawQ = document.getElementById("query").value;
-      let q = normalizeQuery(rawQ);
-      let pcTbody = document.querySelector("#results-pc tbody");
-      let mobileDiv = document.getElementById("results-mobile");
-
-      if (!q) {
-        pcTbody.innerHTML = `<tr><td colspan="4" class="no-results">🔍 検索ワードを入力してください</td></tr>`;
-        mobileDiv.innerHTML = `<div class="no-results">🔍 検索ワードを入力してください</div>`;
-        return;
-      }
-
-      let results = [];
-      if (/^-?\d+$/.test(q)) {
-        // 数値検索
-        results = data.filter(d => d.SignedInt == q);
-      } else if (/^[0-9a-f-]+$/.test(q)) {
-        // HexID / ShortID
-        results = data.filter(d =>
-          d.HexID.toLowerCase() === q ||
-          d.ShortID.toLowerCase() === q
-        );
-      } else {
-        // 名前検索
-        results = data.filter(d => d.Name.toLowerCase().includes(q));
-      }
-
-      if (results.length === 0) {
-        pcTbody.innerHTML = `<tr><td colspan="4" class="no-results">❌ 該当するアイテムが見つかりませんでした</td></tr>`;
-        mobileDiv.innerHTML = `<div class="no-results">❌ 該当するアイテムが見つかりませんでした</div>`;
-      } else {
-        // PC表示
-        pcTbody.innerHTML = results.map(r => `
+    <div class="results-wrapper">
+      <table class="pc-view">
+        <thead>
           <tr>
-            <td>${r.HexID}</td>
-            <td>${r.ShortID}</td>
-            <td>${r.Name}</td>
-            <td>${r.SignedInt}</td>
+            <th width="20%">Hex ID</th>
+            <th width="25%">Signed Int</th>
+            <th>Item Name</th>
           </tr>
-        `).join("");
+        </thead>
+        <tbody id="results-pc-body">
+          <tr>
+            <td colspan="3" class="no-results">
+              <i class="fa-solid fa-magnifying-glass-chart"></i>
+              Enter keywords to search
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        // スマホ表示
-        mobileDiv.innerHTML = results.map(r => `
-          <div class="item-card">
-            HexID    : ${r.HexID}<br>
-            ShortID  : ${r.ShortID}<br>
-            Name     : ${r.Name}<br>
-            SignedInt: ${r.SignedInt}
-          </div>
-        `).join("");
-      }
-    }
+      <div class="mobile-view" id="results-mobile-body">
+        <div class="no-results">
+          <i class="fa-solid fa-magnifying-glass-chart"></i>
+          Enter keywords to search
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    // Enterキーでも検索実行
-    document.getElementById("query").addEventListener("keypress", e => {
-      if (e.key === "Enter") searchItems();
-    });
-  </script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+
 </body>
 </html>
